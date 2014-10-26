@@ -1,0 +1,95 @@
+<head>
+    <meta charset="utf-8">
+    <title>MagicBeacon</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="beacon.css">
+
+	<script type="text/javascript" src="../jquery/jquery-1.8.2.min.js"></script>
+	<script>
+	
+	    url = "http://10.240.154.117:8080/MyBeacon/beacon?seller_id=" ;
+	
+		var seller_id0 = "1000001";
+		var href = location.href;
+		var m, seller_id;
+		
+		m = href.match(/seller_id=(\d+)/);
+		if(!m) seller_id = seller_id0;
+		else seller_id = m[1];
+		
+	
+	$.ajax({
+        url : url + seller_id, //请求地址
+        type : 'GET', //POST或GET请求
+        data : {
+                siteName : "http://www.beacon.com" //参数 JSON格式 如果是GET请求可以直接在URL里写
+        },
+        dataType : 'jsonp',//json 或者 jsonp 默认是html
+        timeout : 10000,
+        error : function() {
+                alert('Time out loading : ' + url);
+        },
+        success : function(JSON) {
+		/* item_list */	
+		var content="";
+		var item_count = JSON.result.length;
+		
+		for( var i = 0; i < item_count; i++){
+		
+			content += "<li><div class=\"list-item\"><div class=\"p\"><a href=\"" + JSON.result[i].url + "\">";
+			content += "<img class=\"p-pic\" src=\"" + JSON.result[i].img_src + "\" style=\"visibility: visible;\">";
+			content += "<span class=\"flag c-icon-p4p\"></span></a></div><div class=\"d\"><a href=\"" + JSON.result[i].url + "\">" ;
+			content += "<h3 class=\"d-title\">" + JSON.result[i].product_name +  "</h3></a>";
+			content += "<p class=\"d-price\"><em class=\"h\">" + JSON.result[i].price + "</em>";
+			content += "<del>" + JSON.result[i].origin_price + "</del></p><div class=\"d-main\">" ; 
+			
+			var fee = JSON.result[i].freight;
+			var freight = "";
+			if( fee > 0.0 ){
+				freight += "运费" + fee;
+			} else {
+				freight = "免运费";
+			}
+			content += "<p class=\"d-freight\">" + freight + "</p>";
+			
+			content += "<p class=\"d-num\">" + JSON.result[i].payment + "人付款</p>";
+			content += "<p class=\"d-area\">" + JSON.result[i].area + "</p></div></div></div>";
+			content += "<div class=\"icons-group\"><div class=\"item-icons-zx\"><div class=\"item-icon icons-miniphone\"></div>已节省" + JSON.result[i].discount +
+					   "￥</div><div class=\"item-icons-jinbi\">金币抵" + JSON.result[i].ticket/100 + "%</div></div></li>" ;
+		
+		}
+				
+		$("#item_list").each(function(){
+			$(this).html(content);
+		});
+		}
+		});
+	
+	
+	
+	
+	</script>
+</head>
+<body>
+<div class="search-list list-view" id="J_SearchList">
+    <div class="J_TopLoading loading" style="display: none">
+        <span>
+        </span>
+        努力加载中
+    </div>
+	
+    <ul>
+        <div id="item_list"  class="page-container J_PageContainer_1" data-page="1">
+		</div>
+    </ul>
+	
+    <div class="J_BottomLoading loading" style="-webkit-transform-origin: 0px 0px; opacity: 1; -webkit-transform: scale(1, 1);">
+        <span>
+        </span>
+        努力加载中
+    </div>
+</div>
+</body>
